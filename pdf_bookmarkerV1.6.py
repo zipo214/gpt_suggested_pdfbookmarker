@@ -96,32 +96,6 @@ def write_bookmarks(pdf_path, bookmarks):
 # Define the main UI
 class MainWindow:
     def __init__(self):
-        self.file_chooser = FileChooser()
-        self.chapter_list = None
-        self.help_section = HelpSection(
-            "To use this application, select a PDF file and its table of contents.\n"
-            "You can then select which chapters to bookmark and specify custom bookmark titles"
-        )
-
-    def run(self):
-        # Choose the PDF file
-        self.file_chooser.choose_file()
-        if not self.file_chooser.file_path:
-            return
-
-        # Get the PDF password (if any)
-        password = None
-        if fitz.has_pdf_load_pdftotext():
-            with open(self.file_chooser.file_path, "rb") as f:
-                if fitz.PDFximage().extract_text(f, password="") is None:
-                    password = messagebox.askstring(
-                        "Password Required",
-                        "Enter the password for this PDF file (if any):",
-                        show="
-
-# Define the main UI
-class MainWindow:
-    def __init__(self):
         # Initialize the file chooser
         self.file_chooser = FileChooser()
 
@@ -243,107 +217,10 @@ class MainWindow:
 
     def choose_pdf_file(self):
         self.file_chooser.choose_file()
-        if self.file_chooser
-                if not self.file_chooser.file_path:
-            return
+        if self.file_chooser:
+            if not self.file_chooser.file_path:
+                return
 
-        # Get the PDF password (if any)
-        password = None
-        if fitz.has_pdf_load_pdftotext():
-            with open(self.file_chooser.file_path, "rb") as f:
-                if fitz.PDFximage().extract_text(f, password="") is None:
-                    password = messagebox.askstring(
-                        "Password Required",
-                        "Enter the password for this PDF file (if any):",
-                        show="*"
-                    )
-
-        # Read the PDF and TOC
-        try:
-            pdf_pages = read_pdf(self.file_chooser.file_path, password)
-            toc = read_toc(self.toc_selector.file_path, password)
-        except Exception as e:
-            messagebox.showerror(
-                "Error",
-                f"Failed to read PDF or TOC: {e}"
-            )
-            return
-
-        # Get the selected chapters and custom titles
-        selected_chapters = self.chapter_list.selected_chapters
-        custom_titles = self.custom_titles_entry.get().split(",")
-
-        # Create the bookmarks
-        bookmarks = create_bookmarks(
-            self.file_chooser.file_path,
-            toc,
-            selected_chapters,
-            custom_titles
-        )
-
-        # Write the bookmarks to the PDF
-        try:
-            write_bookmarks(self.file_chooser.file_path, bookmarks)
-            messagebox.showinfo(
-                "Success",
-                "Bookmarks created successfully!"
-            )
-        except Exception as e:
-            messagebox.showerror(
-                "Error",
-                f"Failed to create bookmarks: {e}"
-            )
-
-    def run(self):
-        # Initialize the main window
-        self.root = tk.Tk()
-        self.root.title("PDF Bookmarker")
-
-        # Add a menu bar
-        self.menu_bar = tk.Menu(self.root)
-        self.root.config(menu=self.menu_bar)
-
-        # Add a File menu
-        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.file_menu.add_command(label="Open PDF", command=self.choose_pdf_file)
-        self.file_menu.add_command(label="Open TOC", command=self.choose_toc_file)
-        self.file_menu.add_separator()
-        self.file_menu.add_command(label="Exit", command=self.exit_application)
-        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
-
-        # Add a Edit menu
-        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.edit_menu.add_command(label="Select All", command=self.select_all_chapters)
-        self.edit_menu.add_command(label="Deselect All", command=self.deselect_all_chapters)
-        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
-
-        # Add a Help menu
-        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.help_menu.add_command(label="Help", command=self.show_help)
-        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
-
-        # Add a Choose PDF button
-        self.choose_pdf_button = tk.Button(
-            self.root,
-            text="Choose PDF file",
-            command=self.choose_pdf_file,
-            font=("Arial", 14)
-        )
-        self.choose_pdf_button.pack(pady=10)
-
-        # Add a Choose TOC button
-        self.choose_toc_button = tk.Button(
-            self.root,
-            text="Choose TOC file",
-            command=self.choose_toc_file,
-            font=("Arial", 14)
-        )
-        self.choose_toc_button.pack(pady=10)
-
-        # Add a Select Chapters section
-        self.select_chapters_label = tk.Label(
-            self.root,
-            text="Select
     def choose_toc_file(self):
         self.file_chooser.choose_file()
         if self.file_chooser.file_path:
@@ -442,34 +319,34 @@ class MainWindow:
         self.choose_toc_button.pack(pady=10)
 
         # Add a Password Entry section
-            self.password_label = tk.Label(
-                self.root,
-                text="Password:",
-                font=("Arial", 16)
-            )
-            self.password_label.pack()
+        self.password_label = tk.Label(
+            self.root,
+            text="Password:",
+            font=("Arial", 16)
+        )
+        self.password_label.pack()
 
-            self.password_entry = tk.Entry(
-                self.root,
-                show="*",
-                font=("Arial", 14)
-            )
-            self.password_entry.pack()
+        self.password_entry = tk.Entry(
+            self.root,
+            show="*",
+            font=("Arial", 14)
+        )
+        self.password_entry.pack()
 
-            # Add a Select Chapters section
-            self.select_chapters_label = tk.Label(
-                self.root,
-                text="Select chapters:",
-                font=("Arial", 16)
-            )
-            self.select_chapters_label.pack()
+        # Add a Select Chapters section
+        self.select_chapters_label = tk.Label(
+            self.root,
+            text="Select chapters:",
+            font=("Arial", 16)
+        )
+        self.select_chapters_label.pack()
 
-            self.chapter_listbox = tk.Listbox(
-                self.root,
-                selectmode=tk.MULTIPLE,
-                font=("Arial", 14)
-            )
-            self.chapter_listbox.pack()
+        self.chapter_listbox = tk.Listbox(
+            self.root,
+            selectmode=tk.MULTIPLE,
+            font=("Arial", 14)
+        )
+        self.chapter_listbox.pack()
 
         # Add a Custom Titles section
         self.custom_titles_label = tk.Label(
@@ -496,9 +373,7 @@ class MainWindow:
 
         # Run the main loop
         self.root.mainloop()
-        
+
         #Define the entry point for the application
-        if name == "main":
-        app= MainWindow()
-        app.run()
-        
+app = MainWindow()
+app.run()
