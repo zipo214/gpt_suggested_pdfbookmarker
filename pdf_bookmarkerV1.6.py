@@ -143,6 +143,7 @@ class MainWindow:
 
         # Initialize the TOC selector
         self.toc_selector = None
+        #self.toc_selector = TOCSelector()
         self.custom_titles_entry = None
 
         # Initialize the chapter list
@@ -249,9 +250,9 @@ class MainWindow:
 
     def choose_pdf_file(self):
         self.file_chooser.choose_file()
-        if self.file_chooser
-                if not self.file_chooser.file_path:
-            return
+        if self.file_chooser:
+            if not self.file_chooser.file_path:
+                return
 
         # Get the PDF password (if any)
         password = None
@@ -349,12 +350,16 @@ class MainWindow:
         # Add a Select Chapters section
         self.select_chapters_label = tk.Label(
             self.root,
-            text="Select
+            text="Select Chapters",
+            command=self.choose_chapters,
+            font=("Arial",14)
+        )
+
     def choose_toc_file(self):
         self.file_chooser.choose_file()
         if self.file_chooser.file_path:
             toc = read_toc(self.file_chooser.file_path, password=self.password)
-            self.toc_selector = TOCSelector(self.root, toc)
+            self.toc_selector=TOCSelector(self.root, toc)
             self.chapter_list = ChapterList(toc)
             self.custom_titles_entry.delete(0, tk.END)
             for i in range(len(toc)):
@@ -397,8 +402,6 @@ class MainWindow:
         write_bookmarks(self.file_chooser.file_path, bookmarks)
 
         messagebox.showinfo("Success", "Bookmarks created successfully.")
-
-    
 
     def run(self):
         # Initialize the main window
@@ -447,36 +450,36 @@ class MainWindow:
         self.choose_toc_button.pack(pady=10)
 
         # Add a Password Entry section
-            self.password_label = tk.Label(
-                self.root,
-                text="Password:",
-                font=("Arial", 16)
-            )
-            self.password_label.pack()
+        self.password_label = tk.Label(
+            self.root,
+            text="Password:",
+            font=("Arial", 16)
+        )
+        self.password_label.pack()
 
-            self.password_entry = tk.Entry(
-                self.root,
-                show="*",
-                font=("Arial", 14)
-            )
-            self.password_entry.pack()
+        self.password_entry = tk.Entry(
+            self.root,
+            show="*",
+            font=("Arial", 14)
+        )
+        self.password_entry.pack()
 
-            # Add a Select Chapters section
-            self.select_chapters_label = tk.Label(
-                self.root,
-                text="Select chapters:",
-                font=("Arial", 16)
-            )
-            self.select_chapters_label.pack()
+        # Add a Select Chapters section
+        self.select_chapters_label = tk.Label(
+            self.root,
+            text="Select chapters:",
+            font=("Arial", 16)
+        )
+        self.select_chapters_label.pack()
 
-            self.chapter_listbox = tk.Listbox(
-                self.root,
-                selectmode=tk.MULTIPLE,
-                font=("Arial", 14)
-            )
-            self.chapter_listbox.pack()
+        self.chapter_listbox = tk.Listbox(
+            self.root,
+            selectmode=tk.MULTIPLE,
+            font=("Arial", 14)
+        )
+        self.chapter_listbox.pack()
 
-        # Add a Custom Titles section
+         # Add a Custom Titles section
         self.custom_titles_label = tk.Label(
         self.root,
         text="Custom titles:",
@@ -501,11 +504,12 @@ class MainWindow:
 
         # Run the main loop
         self.root.mainloop()
-        
-        #Define the entry point for the application
-        if name == "main":
-        app= MainWindow()
+
+    # Define the entry point for the application
+    if __name__ == "main":
+        app = MainWindow()
         app.run()
-        
+
+
 def exit_application(self):
-        self.root.destroy()
+    self.root.destroy()
