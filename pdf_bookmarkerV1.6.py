@@ -102,6 +102,7 @@ class MainWindow:
             "To use this application, select a PDF file and its table of contents.\n"
             "You can then select which chapters to bookmark and specify custom bookmark titles"
         )
+        self.password = None
 
     def run(self):
         # Choose the PDF file
@@ -110,14 +111,29 @@ class MainWindow:
             return
 
         # Get the PDF password (if any)
-        password = None
         if fitz.has_pdf_load_pdftotext():
             with open(self.file_chooser.file_path, "rb") as f:
                 if fitz.PDFximage().extract_text(f, password="") is None:
-                    password = messagebox.askstring(
+                    self.password = messagebox.askstring(
                         "Password Required",
                         "Enter the password for this PDF file (if any):",
-                        show="
+                        show="*"
+                    )
+
+        # Read the table of contents file
+        toc_file_path = os.path.splitext(self.file_chooser.file_path)[0] + "_toc.txt"
+        if os.path.isfile(toc_file_path):
+            toc = read_toc(toc_file_path)
+            self.toc_selector = TOCSelector(self.root, toc)
+            self.chapter_list = ChapterList(toc)
+            self.custom_titles_entry.delete(0, tk.END)
+            for i in range(len(toc)):
+                self.chapter_listbox.insert(tk.END, toc.chapters[i].title)
+
+        # Display an error message if no table of contents file is found
+        else:
+            messagebox.showerror("Error", "No table of contents file found.")
+
 
 # Define the main UI
 class MainWindow:
@@ -137,25 +153,15 @@ class MainWindow:
             "To use this application, select a PDF file and its table of contents.\n"
             "You can then select which chapters to bookmark and specify custom bookmark titles."
             "Welcome to PDF Bookmarker!"
-
             "This application allows you to create bookmarks in a PDF file based on a table of contents file."
-
             "To use this application, follow these steps:"
-
             "1. Click on the ""Choose PDF file"" button and select the PDF file that you want to add bookmarks to."
-
             "2. Click on the ""Choose TOC file"" button and select the table of contents file for the PDF file. The table of contents file should be in the form of bookmarks, with each bookmark representing a chapter or section in the PDF file."
-
             "3. Select the chapters that you want to add bookmarks to. You can select all chapters by clicking on the ""Select All"" option in the Edit menu, or select individual chapters by clicking on them in the chapter list."
-
             "4. If you want to customize the bookmark titles, enter the custom titles in the ""Custom titles"" section. Each title should be on a separate line."
-
             "5. Click on the ""Create bookmarks"" button to create the bookmarks in the PDF file."
-
             "6. The bookmarks should now be visible in the PDF file. You can test them by clicking on them in the bookmark pane."
-
             "If you have any questions or encounter any issues, please consult the documentation or contact customer support."
-
         )
 
         # Initialize the main window
@@ -392,8 +398,7 @@ class MainWindow:
 
         messagebox.showinfo("Success", "Bookmarks created successfully.")
 
-    def exit_application(self):
-        self.root.destroy()
+    
 
     def run(self):
         # Initialize the main window
@@ -502,3 +507,5 @@ class MainWindow:
         app= MainWindow()
         app.run()
         
+def exit_application(self):
+        self.root.destroy()
