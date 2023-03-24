@@ -3,27 +3,20 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import fitz
 
-
 # Define the PDF and TOC classes
 class Chapter:
     def __init__(self, title, page):
         self.title = title
         self.page = page
-
-
 class TOC:
     def __init__(self, chapters):
         self.chapters = chapters
-
     def __iter__(self):
         return iter(self.chapters)
-
-
 # Define the UI elements
 class FileChooser:
     def __init__(self):
         self.file_path = None
-
     def choose_file(self):
         root = tk.Tk()
         root.withdraw()
@@ -32,32 +25,62 @@ class FileChooser:
             title="Choose a PDF file"
         )
 
+class TOCSelector:
+    def __init__(self, parent, toc):
+        self.toc = toc
+        self.selected_chapters = []
+
+                # Create the main window
+        self.top = tk.Toplevel(parent)
+        self.top.title("Select chapters")
+        self.top.grab_set()
+
+                # Add a label and listbox to display the TOC
+        self.toc_label = tk.Label(self.top, text="Table of Contents", font=("Arial", 16))
+        self.toc_label.pack()
+
+        self.toc_listbox = tk.Listbox(self.top, selectmode=tk.MULTIPLE, font=("Arial", 14))
+        self.toc_listbox.pack()
+
+        for i in range(len(toc)):
+            self.toc_listbox.insert(tk.END, toc.chapters[i].title)
+
+        # Add a button to confirm the selection
+        self.confirm_button = tk.Button(
+        self.top,
+        text="OK",
+        command=self.confirm_selection,
+        font=("Arial", 14)
+         )
+        self.confirm_button.pack(pady=10)
+
+    def confirm_selection(self):
+        # Update the selected chapters based on the user's selection
+        self.selected_chapters = []
+        for i in self.toc_listbox.curselection():
+            self.selected_chapters.append(self.toc.chapters[i])
+
+        self.top.destroy()
+
 
 class ChapterList:
     def __init__(self, chapters):
         self.chapters = chapters
         self.selected_chapters = []
-
     def select_chapter(self, index):
         self.selected_chapters.append(self.chapters[index])
-
     def deselect_chapter(self, index):
         self.selected_chapters.remove(self.chapters[index])
-
-
 class HelpSection:
     def __init__(self, content):
         self.content = content
-
     def display(self):
         messagebox.showinfo("Help", self.content)
-
 
 # Define the PDF bookmarking functions
 def read_pdf(pdf_path, password=None):
     with fitz.open(pdf_path, password=password) as doc:
         return doc.page_count
-
 
 def read_toc(pdf_path, password=None):
     with fitz.open(pdf_path, password=password) as doc:
@@ -65,7 +88,6 @@ def read_toc(pdf_path, password=None):
         for toc_item in doc.get_toc():
             toc.append(Chapter(toc_item[1], toc_item[0]))
         return TOC(toc)
-
 
 def create_bookmarks(pdf_path, toc, selected_chapters, custom_titles):
     bookmarks = []
@@ -79,7 +101,6 @@ def create_bookmarks(pdf_path, toc, selected_chapters, custom_titles):
             bookmarks.append(bookmark)
     return bookmarks
 
-
 def write_bookmarks(pdf_path, bookmarks):
     with fitz.open(pdf_path) as doc:
         for i in range(doc.page_count):
@@ -91,7 +112,6 @@ def write_bookmarks(pdf_path, bookmarks):
                 if not bookmarks:
                     break
         doc.save(pdf_path, garbage=4)
-
 
 # Define the main UI
 class MainWindow:
